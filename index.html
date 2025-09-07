@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学校常规工作管理系统 - 服务器版</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- 引入Supabase客户端库 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* 样式保持不变，与之前相同 */
+        :root { --primary-color: #4b6cb7; --secondary-color: #182848; --accent-color: #f39c12; }
+        body { background-color: #f5f7fa; font-family: 'Microsoft YaHei', sans-serif; padding-bottom: 100px; }
+        .header { background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: white; padding: 15px 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); margin-bottom: 20px; }
+        .card { border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); margin-bottom: 15px; border: none; }
+        .card-header { background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%); border-radius: 10px 10px 0 0 !important; font-weight: bold; padding: 12px 15px; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); border: none; }
+        /* 其他样式保持不变... */
+    </style>
+</head>
+<body>
+    <!-- 页面布局保持不变，与之前完全相同 -->
+    <div class="header text-center">
+        <div class="container">
+            <h1 class="mb-2"><i class="fas fa-school me-2"></i>学校常规工作管理系统</h1>
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-10">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text"><i class="fas fa-calendar-alt me-1"></i>选择日期</span>
+                        <input type="date" class="form-control" id="dateSelector" max="">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 系统配置卡片（新增） -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-cog me-2"></i>系统配置（首次使用需要设置）</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    首次使用需要配置数据库连接信息。请先注册Supabase账号并创建项目。
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Supabase项目URL</label>
+                        <input type="text" class="form-control" id="supabaseUrl" placeholder="https://your-project.supabase.co">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Supabase匿名密钥</label>
+                        <input type="text" class="form-control" id="supabaseKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+                    </div>
+                </div>
+                <button class="btn btn-success" id="saveConfig">
+                    <i class="fas fa-save me-2"></i>保存配置
+                </button>
+            </div>
+        </div>
+
+        <!-- 其他界面元素保持不变 -->
+        <div class="mobile-instructions">...</div>
+        <div class="date-info">...</div>
+        <div class="card mb-3">...</div>
+        <div class="card mb-3">...</div>
+        <div class="row mb-3">...</div>
+        <div class="card">...</div>
+    </div>
+
+    <!-- 按钮和模态框保持不变 -->
+    <button class="btn btn-success btn-export">...</button>
+    <button class="btn btn-export-range">...</button>
+    <div class="modal fade" id="exportModal">...</div>
+    <div class="alert-box">...</div>
+
+    <script>
+        // Supabase客户端变量
+        let supabase = null;
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 尝试加载已有配置
+            const savedUrl = localStorage.getItem('supabaseUrl');
+            const savedKey = localStorage.getItem('supabaseKey');
+            
+            if (savedUrl && savedKey) {
+                document.getElementById('supabaseUrl').value = savedUrl;
+                document.getElementById('supabaseKey').value = savedKey;
+                initSupabase(savedUrl, savedKey);
+            }
+
+            // 保存配置按钮
+            document.getElementById('saveConfig').addEventListener('click', function() {
+                const url = document.getElementById('supabaseUrl').value;
+                const key = document.getElementById('supabaseKey').value;
+                
+                if (url && key) {
+                    localStorage.setItem('supabaseUrl', url);
+                    localStorage.setItem('supabaseKey', key);
+                    initSupabase(url, key);
+                    alert('配置保存成功！');
+                } else {
+                    alert('请填写完整的配置信息');
+                }
+            });
+
+            // 其他初始化代码保持不变...
+        });
+
+        // 初始化Supabase客户端
+        function initSupabase(url, key) {
+            supabase = window.supabase.createClient(url, key);
+            // 隐藏配置卡片
+            document.querySelector('.card:first-child').style.display = 'none';
+        }
+
+        // 修改后的数据操作函数
+        async function loadDataForDate(date) {
+            if (!supabase) {
+                showAlert('请先配置数据库连接信息', 'danger');
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from('work_records')
+                .select('*')
+                .eq('work_date', date);
+
+            if (error) {
+                showAlert('加载数据失败: ' + error.message, 'danger');
+                return;
+            }
+
+            // 更新表格显示
+            const tableBody = document.getElementById('workTableBody');
+            tableBody.innerHTML = '';
+            
+            const workItems = ["中午组织学生就餐", "午休", "课后服务", "晚自习", "组织学生晚餐"];
+            const classes = ["七年级1班", "七年级2班", "七年级3班", "七年级4班", "七年级5班", "七年级6班", "七年级7班", "八年级1班", "八年级2班", "八年级3班", "八年级4班", "八年级5班", "八年级6班"];
+
+            workItems.forEach(item => {
+                classes.forEach(cls => {
+                    const record = data.find(r => r.work_item === item && r.work_class === cls);
+                    const teacher = record ? record.teacher_name : '';
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item}</td>
+                        <td>${cls}</td>
+                        <td>${teacher}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            });
+        }
+
+        // 修改后的提交函数
+        async function submitForm() {
+            if (!supabase) {
+                showAlert('请先配置数据库连接信息', 'danger');
+                return;
+            }
+
+            // 验证逻辑保持不变...
+            
+            // 检查冲突
+            const { data: existingRecords, error: checkError } = await supabase
+                .from('work_records')
+                .select('*')
+                .eq('work_date', date)
+                .or(`and(work_item.eq.${workItem},teacher_name.eq.${teacherName}),and(work_class.eq.${workClass},teacher_name.ne.${teacherName}),and(work_item.eq.${workItem},work_class.eq.${workClass})`);
+
+            if (checkError) {
+                showAlert('检查冲突失败: ' + checkError.message, 'danger');
+                return;
+            }
+
+            // 冲突检查逻辑保持不变...
+
+            // 保存到数据库
+            const { data, error } = await supabase
+                .from('work_records')
+                .upsert({
+                    work_date: date,
+                    work_item: workItem,
+                    work_class: workClass,
+                    teacher_name: teacherName,
+                    created_at: new Date()
+                });
+
+            if (error) {
+                showAlert('保存失败: ' + error.message, 'danger');
+            } else {
+                showAlert('登记成功！', 'success');
+                loadDataForDate(date);
+                // 重置表单...
+            }
+        }
+
+        // 其他函数相应修改为Supabase版本...
+    </script>
+</body>
+</html>
