@@ -10,18 +10,185 @@
     <!-- 引入Supabase客户端库 -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* 样式保持不变，与之前相同 */
-        :root { --primary-color: #4b6cb7; --secondary-color: #182848; --accent-color: #f39c12; }
-        body { background-color: #f5f7fa; font-family: 'Microsoft YaHei', sans-serif; padding-bottom: 100px; }
-        .header { background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: white; padding: 15px 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); margin-bottom: 20px; }
-        .card { border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); margin-bottom: 15px; border: none; }
-        .card-header { background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%); border-radius: 10px 10px 0 0 !important; font-weight: bold; padding: 12px 15px; }
-        .btn-primary { background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); border: none; }
-        /* 其他样式保持不变... */
+        :root {
+            --primary-color: #4b6cb7;
+            --secondary-color: #182848;
+            --accent-color: #f39c12;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Microsoft YaHei', sans-serif;
+            padding-bottom: 100px;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 15px;
+            border: none;
+        }
+        .card-header {
+            background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+            border-radius: 10px 10px 0 0 !important;
+            font-weight: bold;
+            padding: 12px 15px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            border: none;
+        }
+        .btn-info {
+            background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
+            border: none;
+        }
+        .btn-export {
+            background: linear-gradient(135deg, var(--accent-color) 0%, #e67e22 100%);
+            border: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-export-range {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            border: none;
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .required:after {
+            content: " *";
+            color: red;
+        }
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .alert-box {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            left: 15px;
+            z-index: 1050;
+            display: none;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .mobile-instructions {
+            background-color: #e9f7fe;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .export-modal .date-range {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .export-modal .date-range span {
+            margin: 0 10px;
+        }
+        .teacher-record {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--primary-color);
+        }
+        .conflict-check {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .conflict-item {
+            color: #856404;
+            font-size: 0.9rem;
+            margin: 5px 0;
+        }
+        .date-info {
+            background-color: #e8f5e8;
+            border-left: 4px solid #28a745;
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+        .future-date {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .config-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+        }
+        .config-card .card-header {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            .btn-lg {
+                padding: 0.5rem 1rem;
+                font-size: 1rem;
+            }
+            .card-header h5 {
+                font-size: 1.1rem;
+            }
+            .export-modal .date-range {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .export-modal .date-range span {
+                margin: 10px 0;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- 页面布局保持不变，与之前完全相同 -->
+    <!-- 顶部标题和日期选择 -->
     <div class="header text-center">
         <div class="container">
             <h1 class="mb-2"><i class="fas fa-school me-2"></i>学校常规工作管理系统</h1>
@@ -37,53 +204,285 @@
     </div>
 
     <div class="container">
-        <!-- 系统配置卡片（新增） -->
-        <div class="card mb-3">
+        <!-- 系统配置卡片 -->
+        <div class="card config-card mb-3" id="configCard">
             <div class="card-header">
                 <h5 class="mb-0"><i class="fas fa-cog me-2"></i>系统配置（首次使用需要设置）</h5>
             </div>
             <div class="card-body">
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-2"></i>
-                    首次使用需要配置数据库连接信息。请先注册Supabase账号并创建项目。
+                    首次使用需要配置Supabase数据库连接信息。请先注册Supabase账号并创建项目。
                 </div>
                 <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Supabase项目URL</label>
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label"><i class="fas fa-link me-1"></i>Supabase项目URL</label>
                         <input type="text" class="form-control" id="supabaseUrl" placeholder="https://your-project.supabase.co">
+                        <small class="form-text">从Supabase项目设置中获取</small>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Supabase匿名密钥</label>
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label"><i class="fas fa-key me-1"></i>Supabase匿名密钥</label>
                         <input type="text" class="form-control" id="supabaseKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+                        <small class="form-text">从Supabase项目设置中获取</small>
                     </div>
                 </div>
-                <button class="btn btn-success" id="saveConfig">
-                    <i class="fas fa-save me-2"></i>保存配置
-                </button>
+                <div class="text-center">
+                    <button class="btn btn-light" id="saveConfig">
+                        <i class="fas fa-save me-2"></i>保存配置
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- 其他界面元素保持不变 -->
-        <div class="mobile-instructions">...</div>
-        <div class="date-info">...</div>
-        <div class="card mb-3">...</div>
-        <div class="card mb-3">...</div>
-        <div class="row mb-3">...</div>
-        <div class="card">...</div>
+        <!-- 移动端使用说明 -->
+        <div class="mobile-instructions">
+            <h5><i class="fas fa-mobile-alt me-2"></i>手机使用说明</h5>
+            <p class="mb-1">1. 点击右上角 <i class="fas fa-ellipsis-v"></i> 选择"添加到主屏幕"</p>
+            <p class="mb-0">2. 下次可直接从手机桌面图标访问</p>
+        </div>
+
+        <!-- 日期提示信息 -->
+        <div class="date-info">
+            <i class="fas fa-info-circle me-2"></i>
+            <span id="dateStatus">当前选择：今日日期，可正常登记</span>
+        </div>
+
+        <!-- 教师查询功能 -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-search me-2"></i>教师工作记录查询</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <label for="teacherSearch" class="form-label"><i class="fas fa-user me-1"></i>输入教师姓名</label>
+                        <input type="text" class="form-control form-control-sm" id="teacherSearch" placeholder="请输入教师姓名查询">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button class="btn btn-info btn-sm w-100" id="searchTeacher">
+                            <i class="fas fa-search me-2"></i>查询记录
+                        </button>
+                    </div>
+                </div>
+                <div id="teacherResults" class="mt-3">
+                    <!-- 查询结果将在这里显示 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 信息填写区域 -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-pencil-alt me-2"></i>常规工作登记</h5>
+            </div>
+            <div class="card-body">
+                <form id="workForm">
+                    <div class="row mb-3">
+                        <div class="col-md-6 col-12 mb-2">
+                            <label for="teacherName" class="form-label required"><i class="fas fa-user me-1"></i>教师姓名</label>
+                            <input type="text" class="form-control form-control-sm" id="teacherName" required placeholder="请输入您的姓名">
+                        </div>
+                        <div class="col-md-6 col-12 mb-2">
+                            <label for="workDate" class="form-label"><i class="fas fa-calendar me-1"></i>日期</label>
+                            <input type="text" class="form-control form-control-sm" id="workDate" disabled>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6 col-12 mb-2">
+                            <label for="workItem" class="form-label required"><i class="fas fa-tasks me-1"></i>常规工作项目</label>
+                            <select class="form-select form-select-sm" id="workItem" required>
+                                <option value="" selected disabled>请选择工作项目</option>
+                                <option value="中午组织学生就餐">中午组织学生就餐</option>
+                                <option value="午休">午休</option>
+                                <option value="课后服务">课后服务</option>
+                                <option value="晚自习">晚自习</option>
+                                <option value="组织学生晚餐">组织学生晚餐</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 col-12 mb-2">
+                            <label for="workClass" class="form-label required"><i class="fas fa-users me-1"></i>班级</label>
+                            <select class="form-select form-select-sm" id="workClass" required>
+                                <option value="" selected disabled>请选择班级</option>
+                                <optgroup label="七年级">
+                                    <option value="七年级1班">七年级1班</option>
+                                    <option value="七年级2班">七年级2班</option>
+                                    <option value="七年级3班">七年级3班</option>
+                                    <option value="七年级4班">七年级4班</option>
+                                    <option value="七年级5班">七年级5班</option>
+                                    <option value="七年级6班">七年级6班</option>
+                                    <option value="七年级7班">七年级7班</option>
+                                </optgroup>
+                                <optgroup label="八年级">
+                                    <option value="八年级1班">八年级1班</option>
+                                    <option value="八年级2班">八年级2班</option>
+                                    <option value="八年级3班">八年级3班</option>
+                                    <option value="八年级4班">八年级4班</option>
+                                    <option value="八年级5班">八年级5班</option>
+                                    <option value="八年级6班">八年级6班</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 冲突检查区域 -->
+                    <div class="conflict-check" id="conflictCheck" style="display: none;">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>冲突检查</h6>
+                        <div id="conflictResults"></div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-sm" id="submitButton">
+                            <i class="fas fa-paper-plane me-2"></i>提交登记
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 统计信息 -->
+        <div class="row mb-3">
+            <div class="col-4">
+                <div class="stat-card">
+                    <div><i class="fas fa-chalkboard-teacher fa-lg mb-1"></i></div>
+                    <div class="stat-number" id="teacherCount">0</div>
+                    <div>登记教师</div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="stat-card">
+                    <div><i class="fas fa-tasks fa-lg mb-1"></i></div>
+                    <div class="stat-number" id="workItemCount">0</div>
+                    <div>工作项</div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="stat-card">
+                    <div><i class="fas fa-users fa-lg mb-1"></i></div>
+                    <div class="stat-number" id="classCount">0</div>
+                    <div>班级</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 数据显示区域 -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-list-alt me-2"></i>工作安排表</h5>
+                <span id="currentDateDisplay" class="badge bg-info"></span>
+            </div>
+            <div class="card-body p-2">
+                <div class="table-container">
+                    <table class="table table-sm table-striped table-hover">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th>工作项目</th>
+                                <th>班级</th>
+                                <th>负责教师</th>
+                            </tr>
+                        </thead>
+                        <tbody id="workTableBody">
+                            <!-- 数据将通过JavaScript动态添加 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- 按钮和模态框保持不变 -->
-    <button class="btn btn-success btn-export">...</button>
-    <button class="btn btn-export-range">...</button>
-    <div class="modal fade" id="exportModal">...</div>
-    <div class="alert-box">...</div>
+    <!-- 导出按钮 -->
+    <button class="btn btn-success btn-export" id="exportBtn" title="导出当天Excel">
+        <i class="fas fa-file-excel fa-lg"></i>
+    </button>
+
+    <!-- 日期范围导出按钮 -->
+    <button class="btn btn-export-range" id="exportRangeBtn" title="按日期范围导出">
+        <i class="fas fa-calendar-alt fa-lg"></i>
+    </button>
+
+    <!-- 日期范围导出模态框 -->
+    <div class="modal fade" id="exportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-calendar me-2"></i>按日期范围导出</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body export-modal">
+                    <div class="date-range">
+                        <div>
+                            <label for="startDate" class="form-label">开始日期</label>
+                            <input type="date" class="form-control" id="startDate" max="">
+                        </div>
+                        <span>至</span>
+                        <div>
+                            <label for="endDate" class="form-label">结束日期</label>
+                            <input type="date" class="form-control" id="endDate" max="">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">导出选项</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="includeEmpty" checked>
+                            <label class="form-check-label" for="includeEmpty">
+                                包含空白记录
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="groupByDate" checked>
+                            <label class="form-check-label" for="groupByDate">
+                                按日期分组
+                            </label>
+                        </div>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>将导出选定日期范围内的所有工作记录
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="confirmExport">导出Excel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示框 -->
+    <div class="alert-box alert alert-dismissible fade show" role="alert">
+        <span id="alertMessage"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         // Supabase客户端变量
         let supabase = null;
+        let isConfigured = false;
 
         // 初始化页面
         document.addEventListener('DOMContentLoaded', function() {
+            // 设置默认日期为今天
+            const today = new Date();
+            const formattedDate = formatDate(today);
+            
+            // 设置日期选择器的最大值为今天
+            document.getElementById('dateSelector').max = formattedDate;
+            document.getElementById('startDate').max = formattedDate;
+            document.getElementById('endDate').max = formattedDate;
+            
+            document.getElementById('dateSelector').value = formattedDate;
+            document.getElementById('workDate').value = formatDisplayDate(today);
+            document.getElementById('currentDateDisplay').textContent = formatDisplayDate(today);
+            document.getElementById('dateStatus').textContent = '当前选择：今日日期，可正常登记';
+            
+            // 设置日期范围默认值（最近一周）
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            document.getElementById('startDate').value = formatDate(oneWeekAgo);
+            document.getElementById('endDate').value = formattedDate;
+            
             // 尝试加载已有配置
             const savedUrl = localStorage.getItem('supabaseUrl');
             const savedKey = localStorage.getItem('supabaseKey');
@@ -92,8 +491,13 @@
                 document.getElementById('supabaseUrl').value = savedUrl;
                 document.getElementById('supabaseKey').value = savedKey;
                 initSupabase(savedUrl, savedKey);
+                // 隐藏配置卡片
+                document.getElementById('configCard').style.display = 'none';
+                // 加载当天的数据
+                loadDataForDate(formattedDate);
+                updateStats(formattedDate);
             }
-
+            
             // 保存配置按钮
             document.getElementById('saveConfig').addEventListener('click', function() {
                 const url = document.getElementById('supabaseUrl').value;
@@ -103,106 +507,646 @@
                     localStorage.setItem('supabaseUrl', url);
                     localStorage.setItem('supabaseKey', key);
                     initSupabase(url, key);
-                    alert('配置保存成功！');
+                    // 隐藏配置卡片
+                    document.getElementById('configCard').style.display = 'none';
+                    // 加载数据
+                    loadDataForDate(formattedDate);
+                    updateStats(formattedDate);
+                    showAlert('配置保存成功！', 'success');
                 } else {
-                    alert('请填写完整的配置信息');
+                    showAlert('请填写完整的配置信息', 'danger');
+                }
+            });
+            
+            // 日期选择器事件监听
+            document.getElementById('dateSelector').addEventListener('change', function() {
+                const selectedDate = this.value;
+                const selectedDateObj = new Date(selectedDate);
+                const today = new Date();
+                
+                document.getElementById('workDate').value = formatDisplayDate(selectedDateObj);
+                document.getElementById('currentDateDisplay').textContent = formatDisplayDate(selectedDateObj);
+                
+                // 更新日期状态提示
+                if (selectedDateObj > today) {
+                    document.getElementById('dateStatus').innerHTML = 
+                        '<span class="future-date"><i class="fas fa-exclamation-triangle me-1"></i>不能选择未来日期进行登记！</span>';
+                    document.getElementById('submitButton').disabled = true;
+                } else {
+                    document.getElementById('dateStatus').textContent = 
+                        `当前选择：${formatDisplayDate(selectedDateObj)}，可正常登记`;
+                    document.getElementById('submitButton').disabled = false;
+                }
+                
+                if (isConfigured) {
+                    loadDataForDate(selectedDate);
+                    updateStats(selectedDate);
+                }
+            });
+            
+            // 表单提交事件
+            document.getElementById('workForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitForm();
+            });
+            
+            // 导出按钮事件
+            document.getElementById('exportBtn').addEventListener('click', exportToExcel);
+            
+            // 日期范围导出按钮事件
+            document.getElementById('exportRangeBtn').addEventListener('click', function() {
+                if (!isConfigured) {
+                    showAlert('请先配置数据库连接信息', 'danger');
+                    return;
+                }
+                
+                // 初始化日期范围选择器的值
+                const today = new Date();
+                const oneWeekAgo = new Date();
+                oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                
+                document.getElementById('startDate').value = formatDate(oneWeekAgo);
+                document.getElementById('endDate').value = formatDate(today);
+                
+                // 显示模态框
+                const exportModal = new bootstrap.Modal(document.getElementById('exportModal'));
+                exportModal.show();
+            });
+            
+            // 确认导出按钮事件
+            document.getElementById('confirmExport').addEventListener('click', exportDateRangeToExcel);
+            
+            // 教师查询按钮事件
+            document.getElementById('searchTeacher').addEventListener('click', searchTeacherRecords);
+            
+            // 回车键触发查询
+            document.getElementById('teacherSearch').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    searchTeacherRecords();
                 }
             });
 
-            // 其他初始化代码保持不变...
+            // 实时冲突检查
+            document.getElementById('teacherName').addEventListener('input', checkConflicts);
+            document.getElementById('workItem').addEventListener('change', checkConflicts);
+            document.getElementById('workClass').addEventListener('change', checkConflicts);
         });
 
         // 初始化Supabase客户端
         function initSupabase(url, key) {
-            supabase = window.supabase.createClient(url, key);
-            // 隐藏配置卡片
-            document.querySelector('.card:first-child').style.display = 'none';
+            try {
+                supabase = window.supabase.createClient(url, key);
+                isConfigured = true;
+                console.log('Supabase初始化成功');
+            } catch (error) {
+                showAlert('Supabase配置错误: ' + error.message, 'danger');
+            }
         }
 
-        // 修改后的数据操作函数
+        // 日期格式化函数
+        function formatDate(date) {
+            if (!(date instanceof Date)) {
+                date = new Date(date);
+            }
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatDisplayDate(date) {
+            if (!(date instanceof Date)) {
+                date = new Date(date);
+            }
+            const weekdays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const weekday = weekdays[date.getDay()];
+            return `${year}年${month}月${day}日 ${weekday}`;
+        }
+
+        // 检查冲突
+        async function checkConflicts() {
+            if (!isConfigured) return;
+
+            const teacherName = document.getElementById('teacherName').value.trim();
+            const workItem = document.getElementById('workItem').value;
+            const workClass = document.getElementById('workClass').value;
+            const date = document.getElementById('dateSelector').value;
+            
+            const conflictCheck = document.getElementById('conflictCheck');
+            const conflictResults = document.getElementById('conflictResults');
+            
+            if (!teacherName || !workItem || !workClass) {
+                conflictCheck.style.display = 'none';
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase
+                    .from('work_records')
+                    .select('*')
+                    .eq('work_date', date);
+
+                if (error) throw error;
+
+                let conflicts = [];
+                
+                // 检查1: 同一个项目中是否已有该教师
+                data.forEach(record => {
+                    if (record.teacher_name === teacherName && record.work_item === workItem) {
+                        conflicts.push(`您已经在【${workItem}】中负责【${record.work_class}】`);
+                    }
+                });
+                
+                // 检查2: 同一个班级是否已有其他教师
+                data.forEach(record => {
+                    if (record.work_class === workClass && record.teacher_name !== teacherName) {
+                        conflicts.push(`【${workClass}】已有【${record.teacher_name}】老师负责【${record.work_item}】`);
+                    }
+                });
+                
+                // 检查3: 同一班级同一项目是否已被登记
+                data.forEach(record => {
+                    if (record.work_item === workItem && record.work_class === workClass && record.teacher_name !== teacherName) {
+                        conflicts.push(`【${workItem} - ${workClass}】已被【${record.teacher_name}】老师登记`);
+                    }
+                });
+                
+                if (conflicts.length > 0) {
+                    conflictCheck.style.display = 'block';
+                    conflictResults.innerHTML = conflicts.map(conflict => 
+                        `<div class="conflict-item"><i class="fas fa-times-circle text-danger me-2"></i>${conflict}</div>`
+                    ).join('');
+                } else {
+                    conflictCheck.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('检查冲突错误:', error);
+            }
+        }
+
+        // 加载指定日期的数据
         async function loadDataForDate(date) {
-            if (!supabase) {
-                showAlert('请先配置数据库连接信息', 'danger');
-                return;
-            }
+            if (!isConfigured) return;
 
-            const { data, error } = await supabase
-                .from('work_records')
-                .select('*')
-                .eq('work_date', date);
+            try {
+                const { data, error } = await supabase
+                    .from('work_records')
+                    .select('*')
+                    .eq('work_date', date);
 
-            if (error) {
+                if (error) throw error;
+
+                // 清空表格
+                const tableBody = document.getElementById('workTableBody');
+                tableBody.innerHTML = '';
+                
+                // 定义所有可能的工作项目和班级组合
+                const workItems = ["中午组织学生就餐", "午休", "课后服务", "晚自习", "组织学生晚餐"];
+                const classes = [
+                    "七年级1班", "七年级2班", "七年级3班", "七年级4班", "七年级5班", "七年级6班", "七年级7班",
+                    "八年级1班", "八年级2班", "八年级3班", "八年级4班", "八年级5班", "八年级6班"
+                ];
+                
+                // 填充表格
+                workItems.forEach(item => {
+                    classes.forEach(cls => {
+                        const record = data.find(r => r.work_item === item && r.work_class === cls);
+                        const teacher = record ? record.teacher_name : '';
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${item}</td>
+                            <td>${cls}</td>
+                            <td>${teacher}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                });
+            } catch (error) {
                 showAlert('加载数据失败: ' + error.message, 'danger');
-                return;
             }
-
-            // 更新表格显示
-            const tableBody = document.getElementById('workTableBody');
-            tableBody.innerHTML = '';
-            
-            const workItems = ["中午组织学生就餐", "午休", "课后服务", "晚自习", "组织学生晚餐"];
-            const classes = ["七年级1班", "七年级2班", "七年级3班", "七年级4班", "七年级5班", "七年级6班", "七年级7班", "八年级1班", "八年级2班", "八年级3班", "八年级4班", "八年级5班", "八年级6班"];
-
-            workItems.forEach(item => {
-                classes.forEach(cls => {
-                    const record = data.find(r => r.work_item === item && r.work_class === cls);
-                    const teacher = record ? record.teacher_name : '';
-                    
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${item}</td>
-                        <td>${cls}</td>
-                        <td>${teacher}</td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            });
         }
 
-        // 修改后的提交函数
+        // 更新统计数据
+        async function updateStats(date) {
+            if (!isConfigured) return;
+
+            try {
+                const { data, error } = await supabase
+                    .from('work_records')
+                    .select('*')
+                    .eq('work_date', date);
+
+                if (error) throw error;
+
+                // 计算教师数量
+                const teachers = new Set();
+                data.forEach(record => {
+                    if (record.teacher_name) {
+                        teachers.add(record.teacher_name);
+                    }
+                });
+                
+                // 计算工作项和班级数量
+                const workItems = new Set();
+                const classes = new Set();
+                
+                data.forEach(record => {
+                    workItems.add(record.work_item);
+                    classes.add(record.work_class);
+                });
+                
+                // 更新显示
+                document.getElementById('teacherCount').textContent = teachers.size;
+                document.getElementById('workItemCount').textContent = workItems.size;
+                document.getElementById('classCount').textContent = classes.size;
+            } catch (error) {
+                console.error('更新统计错误:', error);
+            }
+        }
+
+        // 提交表单
         async function submitForm() {
-            if (!supabase) {
+            if (!isConfigured) {
                 showAlert('请先配置数据库连接信息', 'danger');
                 return;
             }
 
-            // 验证逻辑保持不变...
+            const teacherName = document.getElementById('teacherName').value.trim();
+            const workItem = document.getElementById('workItem').value;
+            const workClass = document.getElementById('workClass').value;
+            const date = document.getElementById('dateSelector').value;
+            const selectedDate = new Date(date);
+            const today = new Date();
             
-            // 检查冲突
-            const { data: existingRecords, error: checkError } = await supabase
-                .from('work_records')
-                .select('*')
-                .eq('work_date', date)
-                .or(`and(work_item.eq.${workItem},teacher_name.eq.${teacherName}),and(work_class.eq.${workClass},teacher_name.ne.${teacherName}),and(work_item.eq.${workItem},work_class.eq.${workClass})`);
-
-            if (checkError) {
-                showAlert('检查冲突失败: ' + checkError.message, 'danger');
+            // 验证日期：不能选择未来日期
+            if (selectedDate > today) {
+                showAlert('不能选择未来日期进行登记！请选择今日或之前的日期。', 'danger');
                 return;
             }
+            
+            // 验证表单
+            if (!teacherName || !workItem || !workClass) {
+                showAlert('请填写所有必填字段！', 'danger');
+                return;
+            }
+            
+            try {
+                // 检查冲突
+                const { data: existingRecords, error: checkError } = await supabase
+                    .from('work_records')
+                    .select('*')
+                    .eq('work_date', date);
 
-            // 冲突检查逻辑保持不变...
+                if (checkError) throw checkError;
 
-            // 保存到数据库
-            const { data, error } = await supabase
-                .from('work_records')
-                .upsert({
-                    work_date: date,
-                    work_item: workItem,
-                    work_class: workClass,
-                    teacher_name: teacherName,
-                    created_at: new Date()
-                });
+                // 检查1: 同一个项目中是否已有该教师
+                for (const record of existingRecords) {
+                    if (record.teacher_name === teacherName && record.work_item === workItem) {
+                        showAlert(`您已经在【${workItem}】中负责【${record.work_class}】，一个教师不能同时负责同一个项目的多个班级！`, 'danger');
+                        return;
+                    }
+                }
+                
+                // 检查2: 同一个班级是否已有其他教师
+                for (const record of existingRecords) {
+                    if (record.work_class === workClass && record.teacher_name !== teacherName) {
+                        showAlert(`【${workClass}】已有【${record.teacher_name}】老师负责【${record.work_item}】，一个班级不能同时由多个教师负责！`, 'danger');
+                        return;
+                    }
+                }
+                
+                // 检查3: 同一班级同一项目是否已被登记
+                for (const record of existingRecords) {
+                    if (record.work_item === workItem && record.work_class === workClass && record.teacher_name !== teacherName) {
+                        showAlert(`【${workItem} - ${workClass}】已被【${record.teacher_name}】老师登记，请选择其他项目或班级！`, 'danger');
+                        return;
+                    }
+                }
+                
+                // 保存到数据库
+                const { error } = await supabase
+                    .from('work_records')
+                    .upsert({
+                        work_date: date,
+                        work_item: workItem,
+                        work_class: workClass,
+                        teacher_name: teacherName,
+                        created_at: new Date()
+                    }, {
+                        onConflict: 'work_date,work_item,work_class'
+                    });
 
-            if (error) {
-                showAlert('保存失败: ' + error.message, 'danger');
-            } else {
-                showAlert('登记成功！', 'success');
+                if (error) throw error;
+
+                // 更新表格
                 loadDataForDate(date);
-                // 重置表单...
+                updateStats(date);
+                
+                // 重置表单
+                document.getElementById('teacherName').value = '';
+                document.getElementById('workItem').selectedIndex = 0;
+                document.getElementById('workClass').selectedIndex = 0;
+                document.getElementById('conflictCheck').style.display = 'none';
+                
+                // 显示成功消息
+                showAlert('登记成功！', 'success');
+            } catch (error) {
+                showAlert('保存失败: ' + error.message, 'danger');
             }
         }
 
-        // 其他函数相应修改为Supabase版本...
+        // 显示提示信息
+        function showAlert(message, type) {
+            const alertBox = document.querySelector('.alert-box');
+            const alertMessage = document.getElementById('alertMessage');
+            
+            alertMessage.textContent = message;
+            alertBox.className = `alert-box alert alert-${type} alert-dismissible fade show`;
+            alertBox.style.display = 'block';
+            
+            // 5秒后自动关闭
+            setTimeout(() => {
+                alertBox.style.display = 'none';
+            }, 5000);
+        }
+
+        // 查询教师记录
+        async function searchTeacherRecords() {
+            if (!isConfigured) {
+                showAlert('请先配置数据库连接信息', 'danger');
+                return;
+            }
+
+            const teacherName = document.getElementById('teacherSearch').value.trim();
+            
+            if (!teacherName) {
+                showAlert('请输入教师姓名！', 'warning');
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase
+                    .from('work_records')
+                    .select('*')
+                    .eq('teacher_name', teacherName)
+                    .order('work_date', { ascending: false });
+
+                if (error) throw error;
+
+                const resultsContainer = document.getElementById('teacherResults');
+                resultsContainer.innerHTML = '';
+                
+                if (data.length === 0) {
+                    resultsContainer.innerHTML = `
+                        <div class="alert alert-warning text-center">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            未找到 ${teacherName} 老师的工作记录
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // 按日期分组
+                const recordsByDate = {};
+                data.forEach(record => {
+                    if (!recordsByDate[record.work_date]) {
+                        recordsByDate[record.work_date] = [];
+                    }
+                    recordsByDate[record.work_date].push(record);
+                });
+                
+                // 显示结果
+                const summary = document.createElement('div');
+                summary.className = 'alert alert-success mb-3';
+                summary.innerHTML = `
+                    <i class="fas fa-check-circle me-2"></i>
+                    共找到 ${data.length} 条 ${teacherName} 老师的工作记录
+                `;
+                resultsContainer.appendChild(summary);
+                
+                Object.keys(recordsByDate).sort().reverse().forEach(date => {
+                    const dateRecords = recordsByDate[date];
+                    const dateGroup = document.createElement('div');
+                    dateGroup.className = 'teacher-record';
+                    dateGroup.innerHTML = `
+                        <h6 class="text-primary">${formatDisplayDate(new Date(date))}</h6>
+                        <div class="row">
+                            ${dateRecords.map(record => `
+                                <div class="col-md-6 mb-2">
+                                    <div class="card card-sm">
+                                        <div class="card-body p-2">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="badge bg-info">${record.work_item}</span>
+                                                <span class="badge bg-success">${record.work_class}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    resultsContainer.appendChild(dateGroup);
+                });
+            } catch (error) {
+                showAlert('查询失败: ' + error.message, 'danger');
+            }
+        }
+
+        // 导出到Excel（当天）
+        async function exportToExcel() {
+            if (!isConfigured) {
+                showAlert('请先配置数据库连接信息', 'danger');
+                return;
+            }
+
+            const date = document.getElementById('dateSelector').value;
+            
+            try {
+                const { data, error } = await supabase
+                    .from('work_records')
+                    .select('*')
+                    .eq('work_date', date);
+
+                if (error) throw error;
+
+                // 定义所有可能的工作项目和班级组合
+                const workItems = ["中午组织学生就餐", "午休", "课后服务", "晚自习", "组织学生晚餐"];
+                const classes = [
+                    "七年级1班", "七年级2班", "七年级3班", "七年级4班", "七年级5班", "七年级6班", "七年级7班",
+                    "八年级1班", "八年级2班", "八年级3班", "八年级4班", "八年级5班", "八年级6班"
+                ];
+                
+                // 准备Excel数据
+                const excelData = [[`${formatDisplayDate(new Date(date))} 工作安排`]];
+                excelData.push(['工作项目', '班级', '负责教师']);
+                
+                workItems.forEach(item => {
+                    classes.forEach(cls => {
+                        const record = data.find(r => r.work_item === item && r.work_class === cls);
+                        const teacher = record ? record.teacher_name : '';
+                        excelData.push([item, cls, teacher]);
+                    });
+                });
+                
+                // 创建工作簿
+                const ws = XLSX.utils.aoa_to_sheet(excelData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "工作安排");
+                
+                // 生成Excel文件并下载
+                const fileName = `学校常规工作安排_${date}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                
+                showAlert('Excel导出成功！', 'success');
+            } catch (error) {
+                showAlert('导出失败: ' + error.message, 'danger');
+            }
+        }
+
+        // 导出日期范围到Excel
+        async function exportDateRangeToExcel() {
+            if (!isConfigured) {
+                showAlert('请先配置数据库连接信息', 'danger');
+                return;
+            }
+
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const includeEmpty = document.getElementById('includeEmpty').checked;
+            const groupByDate = document.getElementById('groupByDate').checked;
+            
+            if (!startDate || !endDate) {
+                showAlert('请选择开始日期和结束日期！', 'danger');
+                return;
+            }
+            
+            if (new Date(startDate) > new Date(endDate)) {
+                showAlert('开始日期不能晚于结束日期！', 'danger');
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase
+                    .from('work_records')
+                    .select('*')
+                    .gte('work_date', startDate)
+                    .lte('work_date', endDate)
+                    .order('work_date', { ascending: true });
+
+                if (error) throw error;
+
+                // 定义所有可能的工作项目和班级组合
+                const workItems = ["中午组织学生就餐", "午休", "课后服务", "晚自习", "组织学生晚餐"];
+                const classes = [
+                    "七年级1班", "七年级2班", "七年级3班", "七年级4班", "七年级5班", "七年级6班", "七年级7班",
+                    "八年级1班", "八年级2班", "八年级3班", "八年级4班", "八年级5班", "八年级6班"
+                ];
+                
+                // 创建工作簿
+                const wb = XLSX.utils.book_new();
+                
+                if (groupByDate) {
+                    // 按日期分组导出，每个日期一个工作表
+                    const dates = [...new Set(data.map(item => item.work_date))].sort();
+                    
+                    if (dates.length === 0 && !includeEmpty) {
+                        showAlert('选定日期范围内没有找到工作记录！', 'warning');
+                        return;
+                    }
+                    
+                    const datesToProcess = includeEmpty ? getDatesInRange(startDate, endDate) : dates;
+                    
+                    datesToProcess.forEach(date => {
+                        const dateData = data.filter(item => item.work_date === date);
+                        const excelData = [[`${formatDisplayDate(new Date(date))} 工作安排`]];
+                        excelData.push(['工作项目', '班级', '负责教师']);
+                        
+                        workItems.forEach(item => {
+                            classes.forEach(cls => {
+                                const record = dateData.find(r => r.work_item === item && r.work_class === cls);
+                                const teacher = record ? record.teacher_name : '';
+                                if (teacher || includeEmpty) {
+                                    excelData.push([item, cls, teacher]);
+                                }
+                            });
+                        });
+                        
+                        const ws = XLSX.utils.aoa_to_sheet(excelData);
+                        XLSX.utils.book_append_sheet(wb, ws, `工作安排_${date}`);
+                    });
+                } else {
+                    // 合并导出到一个工作表
+                    const excelData = [['日期', '工作项目', '班级', '负责教师']];
+                    
+                    data.forEach(record => {
+                        excelData.push([
+                            formatDisplayDate(new Date(record.work_date)),
+                            record.work_item,
+                            record.work_class,
+                            record.teacher_name
+                        ]);
+                    });
+                    
+                    if (data.length === 0 && !includeEmpty) {
+                        showAlert('选定日期范围内没有找到工作记录！', 'warning');
+                        return;
+                    }
+                    
+                    if (includeEmpty && data.length === 0) {
+                        // 添加空白记录
+                        const dates = getDatesInRange(startDate, endDate);
+                        dates.forEach(date => {
+                            workItems.forEach(item => {
+                                classes.forEach(cls => {
+                                    excelData.push([
+                                        formatDisplayDate(new Date(date)),
+                                        item,
+                                        cls,
+                                        ''
+                                    ]);
+                                });
+                            });
+                        });
+                    }
+                    
+                    const ws = XLSX.utils.aoa_to_sheet(excelData);
+                    XLSX.utils.book_append_sheet(wb, ws, "工作安排汇总");
+                }
+                
+                // 生成Excel文件并下载
+                const fileName = `学校常规工作安排_${startDate}_至_${endDate}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                
+                // 关闭模态框
+                const exportModal = bootstrap.Modal.getInstance(document.getElementById('exportModal'));
+                if (exportModal) {
+                    exportModal.hide();
+                }
+                
+                showAlert('日期范围Excel导出成功！', 'success');
+            } catch (error) {
+                showAlert('导出失败: ' + error.message, 'danger');
+            }
+        }
+
+        // 获取日期范围内的所有日期
+        function getDatesInRange(startDate, endDate) {
+            const dates = [];
+            let currentDate = new Date(startDate);
+            const end = new Date(endDate);
+            
+            while (currentDate <= end) {
+                dates.push(formatDate(new Date(currentDate)));
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            
+            return dates;
+        }
     </script>
 </body>
 </html>
